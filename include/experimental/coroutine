@@ -259,6 +259,41 @@ public:
     }
 };
 
+struct noop_coroutine_promise {};
+
+template <>
+class _LIBCPP_TEMPLATE_VIS coroutine_handle<noop_coroutine_promise>
+    : public coroutine_handle<> {
+  using _Base = coroutine_handle<>;
+  using _Promise = noop_coroutine_promise;
+public:
+
+    _LIBCPP_INLINE_VISIBILITY
+    _Promise& promise() const {
+        return *reinterpret_cast<_Promise*>(
+            __builtin_coro_promise(this->__handle_, __alignof(_Promise), false));
+    }
+
+    constexpr explicit operator bool() const noexcept { return true; }
+    constexpr bool done() const noexcept { return false; }
+
+    constexpr void operator()() const noexcept {}
+    constexpr void resume() const noexcept {}
+    constexpr void destroy() const noexcept {}
+
+    friend coroutine_handle<noop_coroutine_promise> noop_coroutine() {
+      return {};
+    }
+
+private:
+
+    coroutine_handle() {
+      this->__handle_ = __builtin_coro_noop();
+    }
+};
+
+using noop_coroutine_handle = coroutine_handle<noop_coroutine_promise>;
+
 struct _LIBCPP_TYPE_VIS suspend_never {
   _LIBCPP_ALWAYS_INLINE
   bool await_ready() const _NOEXCEPT { return true; }
