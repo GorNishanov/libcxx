@@ -281,11 +281,8 @@ public:
     constexpr void resume() const noexcept {}
     constexpr void destroy() const noexcept {}
 
-    friend coroutine_handle<noop_coroutine_promise> noop_coroutine() {
-      return {};
-    }
-
 private:
+    friend coroutine_handle<noop_coroutine_promise> noop_coroutine()  _NOEXCEPT;
 
     coroutine_handle() {
       this->__handle_ = __builtin_coro_noop();
@@ -293,6 +290,11 @@ private:
 };
 
 using noop_coroutine_handle = coroutine_handle<noop_coroutine_promise>;
+
+inline _LIBCPP_ALWAYS_INLINE
+noop_coroutine_handle noop_coroutine() _NOEXCEPT {
+  return {};
+}
 
 struct _LIBCPP_TYPE_VIS suspend_never {
   _LIBCPP_ALWAYS_INLINE
